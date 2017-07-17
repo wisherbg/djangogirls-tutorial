@@ -25,8 +25,7 @@ SECRET_KEY = '_0*hbmofbkb5os7vpaa3&ib#%r%l(@zcde&!%69gsz(i5f99f7'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['127.0.0.1', 'wisherbg.pythonanywhere.com']
 
 # Application definition
 
