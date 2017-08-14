@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Post
-from .forms import PostForm
+from .models import Post, Comment
+from .forms import PostForm, CommentForm
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 
@@ -14,8 +14,36 @@ def post_list(request):
 
 def post_detail(request, pk):
   post = get_object_or_404(Post, pk=pk)
-  return render(request, 'blog/post_detail.html', {'post': post})
+  form = CommentForm()
+  return render(request, 'blog/post_detail.html', {'post': post, 'form': form})
 
+def post_comment(request, pk):
+  post = get_object_or_404(Post, pk=pk)
+  if request.method == 'POST':
+    form = CommentForm(request.POST)
+    if form.is_valid():
+      comment = form.save(commit=False)
+      comment.post = post
+      comment.save()
+      return redirect('post_detail', pk=post.pk)
+  else:
+    return redirect('post_detail', pk=post.pk)
+
+
+@login_required
+def comment_delete(request, pk):
+  comment = get_object_or_404(Comment, pk=pk)
+  post_pk = comment.post.pk
+  comment.delete()
+  return redirect('post_detail', pk=post_pk)
+
+
+@login_required
+def comment_approve(request, pk):
+  comment = get_object_or_404(Comment, pk=pk)
+  comment.approve()
+  post_pk = comment.post.pk
+  return redirect('post_detail', pk=post_pk)
 
 @login_required
 def add_new(request):
@@ -56,7 +84,7 @@ def draft_posts(request):
 def post_publish(request, pk):
   post = get_object_or_404(Post, pk=pk)
   post.publish()
-  return redirect('post_detail', pk=post.pk)
+  return redirect('post_detail', pk=post.pk,)
 
 
 @login_required

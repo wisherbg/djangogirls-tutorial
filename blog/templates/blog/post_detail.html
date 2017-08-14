@@ -22,20 +22,47 @@
                 <hr>
 
                 <!-- Date/Time -->
-                {% if post.published_date %}
-                <p><span class="glyphicon glyphicon-time"></span> {{ post.published_date }}</p>
-                <hr>
-                {% else %}
-                    <a class="btn btn-default" href="{% url 'post_publish' pk=post.pk %}">Publish</a>
+                {% if user.authenticated %}
+                    {% if post.published_date %}
+                    <p><span class="glyphicon glyphicon-time"></span> {{ post.published_date }}</p>
+                    <hr>
+                    {% else %}
+                        <a class="btn btn-default" href="{% url 'post_publish' pk=post.pk %}">Publish</a>
+                    {% endif %}
+                    <a class="btn btn-default" href="{% url 'post_delete' pk=post.pk %}"><span class="glyphicon glyphicon-remove"></span></a>
                 {% endif %}
-                <a class="btn btn-default" href="{% url 'post_delete' pk=post.pk %}"><span class="glyphicon glyphicon-remove"></span></a>
-
 
                 <!-- Post Content -->
-    <p>{{ post.text|linebreaksbr }}</p>
-
+                <p>{{ post.text|linebreaksbr }}</p>
                 <hr>
-
-
+                    <div class="well">
+                        <h4>Leave a comment</h4>
+                        <form method="POST" action="/post/{{ post.pk }}/comment/">{% csrf_token %}
+                            <div class="form-group">
+                                {{ form.as_p }}
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
+                    </div>
+                <hr>
+                {% for comment in post.comments.all %}
+                    {% if comment.approved_comment or user.is_authenticated %}
+                        <div class="media">
+                            <div class="media-body">
+                                <h4 class="media-heading"> {{ comment.author }}
+                                    <small> {{ comment.created_date }}</small>
+                                </h4>
+                                {% if not comment.approved_comment %}
+                                    <a class="btn btn-default" href="{% url 'comment_delete' pk=comment.pk %}"><span class="glyphicon glyphicon-remove"></span></a>
+                                    <a class="btn btn-default" href="{% url 'comment_approve' pk=comment.pk %}"><span class="glyphicon glyphicon-ok"></span></a>
+                                {% endif %}
+                                {{ comment.text }}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% empty %}
+                    <p>No comments here yet :(</p>
+                {% endfor %}
                 </div>
+
 {% endblock content %}
