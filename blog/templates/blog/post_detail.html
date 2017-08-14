@@ -1,16 +1,41 @@
 {% extends 'blog/base.html' %}
 
 {% block content %}
-        <div class="post">
-        {% if post.published_date %}
-            <div class="date">
-                {{ post.published_date }}
-            </div>
-        {% endif %}
-        {% if user.is_authenticated %}
-            <a class="btn btn-default" href="{% url 'post_edit' pk=post.pk %}"><span class="glyphicon glyphicon-pencil"></span></a>
-        {% endif %}
-            <h1><a href="">{{ post.title }}</a></h1>
-            <p>{{ post.text|linebreaksbr }}</p>
-        </div>
+<div class="col-lg-8">
+
+                <!-- Blog Post -->
+
+                <!-- Title -->
+                <h1>
+                    {{ post.title }}
+                    <!-- Edit button -->
+                    {% if user.is_authenticated %}
+                        <a class="btn btn-default" href="{% url 'post_edit' pk=post.pk %}"><span class="glyphicon glyphicon-pencil pull-left"></span></a>
+                    {% endif %}
+                </h1>
+
+                <!-- Author -->
+                <p class="lead">
+                    by <a href="#">{{ post.author }}</a>
+                </p>
+
+                <hr>
+
+                <!-- Date/Time -->
+                {% if post.published_date %}
+                <p><span class="glyphicon glyphicon-time"></span> {{ post.published_date }}</p>
+                <hr>
+                {% else %}
+                    <a class="btn btn-default" href="{% url 'post_publish' pk=post.pk %}">Publish</a>
+                {% endif %}
+                <a class="btn btn-default" href="{% url 'post_delete' pk=post.pk %}"><span class="glyphicon glyphicon-remove"></span></a>
+
+
+                <!-- Post Content -->
+    <p>{{ post.text|linebreaksbr }}</p>
+
+                <hr>
+
+
+                </div>
 {% endblock content %}
